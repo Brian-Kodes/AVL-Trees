@@ -23,17 +23,9 @@ public:
     AVLNode(const Key& key, const Value& value, AVLNode<Key, Value>* parent);
     virtual ~AVLNode();
 
-    // Getter/setter for the node's height.
     int8_t getBalance () const;
     void setBalance (int8_t balance);
     void updateBalance(int8_t diff);
-
-  //helpers 
-  //rotate left rotate right
-  //remove fix insert fix
-    // Getters for parent, left, and right. These need to be redefined since they
-    // return pointers to AVLNodes - not plain Nodes. See the Node class in bst.h
-    // for more information.
     virtual AVLNode<Key, Value>* getParent() const override;
     virtual AVLNode<Key, Value>* getLeft() const override;
     virtual AVLNode<Key, Value>* getRight() const override;
@@ -230,39 +222,37 @@ void AVLTree<Key, Value>::insertFix(AVLNode<Key,Value>* parent, AVLNode<Key,Valu
       insertFix(GrandParent, parent);
       return;
     }
-    //else
-    //{
-      if (child == parent -> getLeft())
-      {
-        rotateRight(GrandParent);
-        parent -> setBalance(0);
-        GrandParent -> setBalance(0);
-      }
-      else
-      {
-        rotateLeft(parent);
-        rotateRight(GrandParent);
-      }
-        if (child -> getBalance() == -1)
-        {
-          parent -> setBalance(0);
-          GrandParent -> setBalance(1);
-          child -> setBalance(0);
-        }
-        else if (child -> getBalance() == 0)
-        {
-          parent -> setBalance(0);
-          GrandParent -> setBalance(0);
-          child -> setBalance(0);
-        }
-        else
-        {
-          parent -> setBalance(-1);
-          GrandParent -> setBalance(0);
-          child -> setBalance(0);
-        }
-      //}
+    if (child == parent -> getLeft())
+    {
+      rotateRight(GrandParent);
+      parent -> setBalance(0);
+      GrandParent -> setBalance(0);
     }
+    else
+    {
+      rotateLeft(parent);
+      rotateRight(GrandParent);
+    }
+    if (child -> getBalance() == -1)
+    {
+      parent -> setBalance(0);
+      GrandParent -> setBalance(1);
+      child -> setBalance(0);
+    }
+    else if (child -> getBalance() == 0)
+    {
+      parent -> setBalance(0);
+      GrandParent -> setBalance(0);
+      child -> setBalance(0);
+    }
+    else
+    {
+      parent -> setBalance(-1);
+      GrandParent -> setBalance(0);
+      child -> setBalance(0);
+    }
+      //}
+  }
   else
   {
     GrandParent -> updateBalance(1);
@@ -275,40 +265,36 @@ void AVLTree<Key, Value>::insertFix(AVLNode<Key,Value>* parent, AVLNode<Key,Valu
       insertFix(GrandParent, parent);
       return;
     }
-    //else
-    //{
-      if (child == parent -> getRight())
-      {
-        rotateLeft(GrandParent);
-        parent -> setBalance(0);
-        GrandParent -> setBalance(0);
-      }
-      else
-      {
-        rotateRight(parent);
-        rotateLeft(GrandParent);
-      }
+    if (child == parent -> getRight())
+    {
+      rotateLeft(GrandParent);
+      parent -> setBalance(0);
+      GrandParent -> setBalance(0);
+    }
+    else
+    {
+      rotateRight(parent);
+      rotateLeft(GrandParent);
+    }
 
-        if (child -> getBalance() == 1)
-        {
-          parent -> setBalance(0);
-          GrandParent -> setBalance(-1);
-          child -> setBalance(0);
-        }
-        else if (child -> getBalance() == 0)
-        {
-          parent -> setBalance(0);
-          GrandParent -> setBalance(0);
-          child -> setBalance(0);
-        }
-        else
-        {
-          parent -> setBalance(1);
-          GrandParent -> setBalance(0);
-          child -> setBalance(0);
-        }
-      
-    //}
+    if (child -> getBalance() == 1)
+    {
+      parent -> setBalance(0);
+      GrandParent -> setBalance(-1);
+      child -> setBalance(0);
+    }
+    else if (child -> getBalance() == 0)
+    {
+      parent -> setBalance(0);
+      GrandParent -> setBalance(0);
+      child -> setBalance(0);
+    }
+    else
+    {
+      parent -> setBalance(1);
+      GrandParent -> setBalance(0);
+      child -> setBalance(0);
+    }
   }
 }
 
@@ -325,14 +311,9 @@ void AVLTree<Key, Value>::insert(const std::pair<const Key, Value> &new_item)
   }
   AVLNode<Key, Value>* current = (AVLNode<Key,Value>*) this->root_;
   AVLNode<Key, Value>* p = NULL;
-  //BinarySearchTree<Key,Value>::insert(new_item);
-    //AVLNode<Key, Value> searchNode = BinarySearchTree<Key,Value>::internalFind(new_item.first);
-  //used to be a if (this -> root != NULL);
     while (current != NULL)
     {
       p = current;
-      //current node to compare w node in tree
-      // another node to point at parent
       if (new_item.first < current -> getKey())
       {
         current = current -> getLeft();
@@ -372,13 +353,8 @@ void AVLTree<Key, Value>::insert(const std::pair<const Key, Value> &new_item)
         p -> setBalance(1);
         toInsert -> setBalance(0);
       }
-      //p -> updateBalance (balval);
       insertFix(p, toInsert);
     }
-    // {
-    //   root -> getLeft() = insert(root->getLeft(), new_item.first);
-    // }
-
 }
 
 
@@ -533,12 +509,8 @@ void AVLTree<Key, Value>::remove(const Key& key)
     nodeSwap(predecessorNode, nodetoBeRemoved);
   }
   AVLNode<Key,Value>* removeP = nodetoBeRemoved -> getParent();
-  AVLNode<Key,Value>* child = nodetoBeRemoved -> getLeft();
-  if (nodetoBeRemoved -> getRight() != NULL)
-  {
-    child = nodetoBeRemoved -> getRight();
-  }
-  /*if (nodetoBeRemoved -> getLeft() != NULL || nodetoBeRemoved->getRight() != NULL)
+  AVLNode<Key,Value>* child = NULL;
+  if (nodetoBeRemoved -> getLeft() != NULL || nodetoBeRemoved->getRight() != NULL)
   {
     if (nodetoBeRemoved -> getLeft() != NULL)
     {
@@ -548,12 +520,8 @@ void AVLTree<Key, Value>::remove(const Key& key)
     {
       child = nodetoBeRemoved -> getRight();
     }
-  }*/
-
-  if (child != NULL)
-  {
-    child -> setParent(removeP);
   }
+
   if (removeP != NULL)
   {
     if (removeP -> getLeft() == nodetoBeRemoved)
@@ -570,6 +538,11 @@ void AVLTree<Key, Value>::remove(const Key& key)
   else
   {
     this -> root_ = child;
+  }
+
+  if (child != NULL)
+  {
+    child -> setParent(removeP);
   }
   delete nodetoBeRemoved;
   removeFix(removeP, diff);
